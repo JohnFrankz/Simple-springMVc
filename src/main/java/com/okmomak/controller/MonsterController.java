@@ -2,15 +2,13 @@ package com.okmomak.controller;
 
 import com.okmomak.entity.Monster;
 import com.okmomak.service.MonsterService;
-import com.okmomak.spring.annotation.Autowired;
-import com.okmomak.spring.annotation.Controller;
-import com.okmomak.spring.annotation.RequestMapping;
-import com.okmomak.spring.annotation.RequestParam;
+import com.okmomak.spring.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -141,5 +139,13 @@ public class MonsterController {
             return "redirect:login_ok.jsp";
         }
         return "redirect:/login_error.jsp";
+    }
+
+    @RequestMapping("list/json")
+    @ResponseBody
+    public List<Monster> listJson(HttpServletRequest request, HttpServletResponse response) {
+        List<Monster> monsters = monsterService.listMonster();
+
+        return monsters;
     }
 }

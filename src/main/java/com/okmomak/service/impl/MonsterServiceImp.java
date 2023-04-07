@@ -19,6 +19,12 @@ public class MonsterServiceImp implements MonsterService {
         List<Monster> monsters = new ArrayList<>();
         monsters.add(new Monster(1, "John", 2, "吹风"));
         monsters.add(new Monster(2, "frank", 22, "笑"));
+        monsters.add(new Monster(1, "John", 2, "吹风"));
+        monsters.add(new Monster(2, "frank", 22, "笑"));
+        monsters.add(new Monster(1, "John", 2, "吹风1"));
+        monsters.add(new Monster(2, "frank", 22, "笑1"));
+        monsters.add(new Monster(1, "John", 2, "吹风2"));
+        monsters.add(new Monster(2, "frank", 22, "笑2"));
         return monsters;
     }
 

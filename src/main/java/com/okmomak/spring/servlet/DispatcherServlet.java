@@ -1,9 +1,11 @@
 package com.okmomak.spring.servlet;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.okmomak.spring.Handler;
 import com.okmomak.spring.annotation.Controller;
 import com.okmomak.spring.annotation.RequestMapping;
 import com.okmomak.spring.annotation.RequestParam;
+import com.okmomak.spring.annotation.ResponseBody;
 import com.okmomak.spring.context.WebApplicationContext;
 
 import javax.servlet.ServletConfig;
@@ -81,7 +83,12 @@ public class DispatcherServlet extends HttpServlet {
                 Method method = handler.getMethod();
                 Object[] params = getParams(method, request);
                 Object res = method.invoke(handler.getController(), params);
-                if (method.getReturnType().isAssignableFrom(String.class)) {
+                if (method.isAnnotationPresent(ResponseBody.class)) {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    String json = objectMapper.writeValueAsString(res);
+                    response.setContentType("application/json;charset=utf-8");
+                    response.getWriter().print(json);
+                } else if (method.getReturnType().isAssignableFrom(String.class)) {
                     String result = (String) res;
                     if (result.contains("redirect:")) {
                         result = result.substring(9);

@@ -16,3 +16,6 @@ GET {{path}}/monster/query2?name=John&skill=hh
 
 ### test view parser
 GET {{path}}/login?name=john
+
+### test ResponseBody
+GET {{path}}/list/json
