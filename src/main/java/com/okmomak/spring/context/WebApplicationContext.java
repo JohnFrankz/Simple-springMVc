@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-Simple springMVc
 public class WebApplicationContext {
     private List<String> classFullPathList = new ArrayList<>();
     public ConcurrentHashMap<String, Object> singletonObjects = new ConcurrentHashMap<>();
@@ -28,11 +27,8 @@ public class WebApplicationContext {
 
     public void init(String contextConfigLocation) {
         getAllClassesFullPath(contextConfigLocation.split(":")[1]);
-        System.out.println("classFullPathList = " + classFullPathList);
         executeInstance();
-
         executeAutoWired();
-        System.out.println("ok");
     }
 
     private void executeInstance() {

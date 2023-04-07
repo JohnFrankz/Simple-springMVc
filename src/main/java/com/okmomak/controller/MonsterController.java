@@ -132,4 +132,14 @@ public class MonsterController {
         }
         System.out.println("ok!!!!!!!!!!!!!");
     }
+
+    @RequestMapping("login")
+    public String login(HttpServletRequest request, String name) {
+        System.out.println("name = " + name);
+        request.setAttribute("name", name);
+        if (name.equals("john")) {
+            return "redirect:login_ok.jsp";
+        }
+        return "redirect:/login_error.jsp";
+    }
 }

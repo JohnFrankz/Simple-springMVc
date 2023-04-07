@@ -37,6 +37,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("utf-8");
         defaultParams.put("HttpServletRequest", req);
         defaultParams.put("HttpServletResponse", resp);
         executeDispatch(req, resp);
@@ -60,7 +61,6 @@ public class DispatcherServlet extends HttpServlet {
                 continue;
             }
 
-            // String value = "";
             for (Method method : clazz.getDeclaredMethods()) {
                 if (!method.isAnnotationPresent(RequestMapping.class)) {
                     continue;
@@ -80,22 +80,30 @@ public class DispatcherServlet extends HttpServlet {
             } else {
                 Method method = handler.getMethod();
                 Object[] params = getParams(method, request);
-
-                for (Object param : params) {
-                    System.out.println("param = " + param);
+                Object res = method.invoke(handler.getController(), params);
+                if (method.getReturnType().isAssignableFrom(String.class)) {
+                    String result = (String) res;
+                    if (result.contains("redirect:")) {
+                        result = result.substring(9);
+                        result = result.startsWith("/")
+                                ? request.getContextPath() + result
+                                : request.getContextPath() + "/" + result;
+                        response.sendRedirect(result);
+                        System.out.println("result.substring(9) = " + result);
+                    } else if (result.contains("forward:")) {
+                        request.getRequestDispatcher(result.substring(8)).forward(request, response);
+                    } else {
+                        request.getRequestDispatcher(result).forward(request, response);
+                    }
                 }
-                method.invoke(handler.getController(), params);
             }
-        } catch (IOException | IllegalAccessException | InvocationTargetException e) {
+        } catch (IOException | IllegalAccessException | InvocationTargetException | ServletException e) {
             e.printStackTrace();
         }
     }
 
     private Object[] getParams(Method method, HttpServletRequest request) {
-        // 获得方法中的所有参数的名字
-
         Parameter[] parameters = method.getParameters();
-
         Map<String, String[]> parameterMap = request.getParameterMap();
         Object[] params = packageParameters(parameters, parameterMap);
         return params;
@@ -126,59 +134,6 @@ public class DispatcherServlet extends HttpServlet {
                 }
             }
         }
-        return params;
-    }
-
-    private void packageNoAnnotationParameters(Object[] params, Parameter[] parameters, Map<String, String[]> parameterMap) {
-        for (int i = 0; i < parameters.length; i++) {
-            if (params[i] != null) {
-                continue;
-            }
-
-            Parameter parameter = parameters[i];
-            String name = parameter.getName();
-            String[] value = parameterMap.get(name);
-            if (value == null) {
-                continue;
-            }
-            params[i] = value[0];
-        }
-    }
-
-    private void packageAnnotationParameters(Object[] params, Parameter[] parameters, Map<String, String[]> parameterMap) {
-        for (int i = 0; i < parameters.length; i++) {
-            Parameter parameter = parameters[i];
-            System.out.println("parameter.getName() = " + parameter.getName());
-            if (parameter.isAnnotationPresent(RequestParam.class)) {
-                String paraName = parameter.getAnnotation(RequestParam.class).value();
-                if (!parameterMap.containsKey(paraName)) {
-                    continue;
-                }
-
-                if (paraName.isEmpty()) {
-                    paraName = parameter.getName();
-                }
-                String[] paraValues = parameterMap.get(paraName);
-                if (paraValues != null) {
-                    params[i] = paraValues[0];
-                }
-            }
-        }
-    }
-
-    private Object[] packageDefaultParameters(Class<?>[] parameterTypes) {
-
-        int len = parameterTypes.length;
-        Object[] params = new Object[len];
-        // 封装 HttpServletRequest, HttpServletResponse 到参数数组
-        for (int i = 0; i < len; i++) {
-            for (String key : defaultParams.keySet()) {
-                if (key.equals(parameterTypes[i].getSimpleName())) {
-                    params[i] = defaultParams.get(key);
-                }
-            }
-        }
-
         return params;
     }
 
