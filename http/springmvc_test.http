@@ -1,0 +1,15 @@
+
+### test DispatcherServlet
+GET {{path}}/aa
+
+### test handler(reuqest url)
+GET {{path}}/list
+
+### test handler
+GET  {{path}}/order/aa
+
+### test AutoWired
+GET {{path}}/monster/list
+
+### test RequestParam
+GET {{path}}/monster/query2?name=John&skill=hh
